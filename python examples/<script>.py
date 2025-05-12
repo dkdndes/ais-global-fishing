@@ -1,4 +1,8 @@
+"""
+Placeholder file created by mistake during documentation generation.
 
-Make sure your virtual-env is activated and `.env` contains a valid API token.
-
----
+This file is **not** an executable example.  It only exists so that the
+repository stays syntactically valid when tools like `flake8` scan every
+`*.py` file.  Feel free to delete it or ignore it; all real runnable
+examples live in the `examples/` directory.
+"""
