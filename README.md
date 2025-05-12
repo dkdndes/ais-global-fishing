@@ -10,41 +10,69 @@ tracks, behavioral events, port-visits, encounters, trips, risk scores & more
 ## Installation
 
 ```bash
-# Using uv (recommended)
-uv install git+https://github.com/dkdndes/ais-global-fishing.git
-
-# Or using pip
+# Using pip
 pip install git+https://github.com/dkdndes/ais-global-fishing.git
+
+# Or install from source
+git clone https://github.com/dkdndes/ais-global-fishing.git
+cd ais-global-fishing
+pip install -e .
+```
+
+## Authentication
+
+You'll need an API key from Global Fishing Watch. Once you have it, you can:
+
+### Option A: Use an environment variable
+
+```bash
+export GLOBALFISHING_WATCH_API_KEY="your-api-key-here"
+```
+
+Or create a `.env` file in your project directory:
+
+```
+GLOBALFISHING_WATCH_API_KEY=your-api-key-here
+```
+
+### Option B: Pass the API key directly
+
+```python
+from ais_global_fishing import GFWClient
+
+client = GFWClient(api_key="your-api-key-here")
 ```
 
 ## Quick Start
 
-1. Get your API token from [Global Fishing Watch](https://globalfishingwatch.org/)
-2. Create a `.env` file with your token:
-   ```
-   GLOBALFISHING_WATCH_API_KEY=your_api_key_here
-   ```
-3. Start using the library:
-
 ```python
 from ais_global_fishing import GFWClient
+from datetime import datetime, timedelta
 
 # Initialize the client
 client = GFWClient()
 
 # Search for vessels
-vessels = client.search_vessels(query="368045130")
+results = client.search_vessels(query="BOYANG")
 
-# Get vessel details
-vessel_details = client.get_vessel_details(vessel_id="your-vessel-id")
-
-# Get vessel tracks
-from datetime import datetime
-tracks = client.get_track(
-    vessel_id="your-vessel-id",
-    start=datetime(2022, 1, 1),
-    end=datetime(2022, 1, 31)
-)
+if results.get("entries"):
+    vessel = results["entries"][0]
+    vessel_id = vessel["id"]
+    
+    print(f"Found vessel: {vessel['name']} (ID: {vessel_id})")
+    
+    # Get vessel details
+    details = client.get_vessel_details(vessel_id)
+    
+    # Get recent track
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=7)
+    
+    try:
+        track = client.get_track(vessel_id, start=start_date, end=end_date)
+        print(f"Retrieved {len(track['features'])} track points")
+    except FileNotFoundError:
+        print("Track data not available for this vessel")
 ```
 
 ## Features
@@ -56,21 +84,41 @@ tracks = client.get_track(
 - Get port visits, trips, and risk scores
 - Fully typed API for better developer experience
 
-## CLI Tool
+## Examples
 
-The package also includes a command-line interface:
+The package includes several example scripts in the `examples/` directory:
+
+| Script                                   | What it shows                               |
+| ---------------------------------------- | ------------------------------------------- |
+| `examples/example_usage.py`              | End-to-end: search + details                |
+| `examples/example_track.py`              | Recent 7-day AIS track                      |
+| `examples/example_events.py`             | Behavioural events (fishing, port-visit)    |
+| `examples/example_port_visits.py`        | Port calls in last year                     |
+| `examples/example_bulk_vessels.py`       | Bulk identity lookup with extra parameters  |
+| `examples/example_search_advanced.py`    | Flags, gear-types, binary responses         |
+
+Run any example with:
 
 ```bash
-# Search for a vessel
-python -m ais_global_fishing search 368045130
+python examples/example_usage.py
+```
 
-# Get vessel details
-python -m ais_global_fishing details your-vessel-id
+Or use the provided script:
+
+```bash
+./run_examples.sh example_usage
 ```
 
 ## Documentation
 
-For more detailed documentation, see the [docs](./docs) directory.
+For more detailed documentation:
+
+```bash
+pip install -e ".[docs]"
+mkdocs serve
+```
+
+Then visit http://127.0.0.1:8000/ in your browser.
 
 ## License
 
