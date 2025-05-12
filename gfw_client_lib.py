@@ -21,7 +21,8 @@ class GFWClient:
         Initialize the client.
 
         Parameters:
-            api_key (str): API key for authentication. If not provided, read from GLOBALFISHING_WATCH_API_KEY env var or .env file.
+            api_key (str): API key for authentication. If not provided, read from GLOBALFISHING_WATCH_API_KEY
+                           env var or .env file.
             base_url (str): Base URL for the API.
         """
         if not api_key:
@@ -34,48 +35,94 @@ class GFWClient:
         self.session = requests.Session()
         self.session.headers.update({"Authorization": f"Bearer {api_key}"})
 
-    def search_vessels(self, query, datasets=None, includes=None, limit=20, match_fields=None):
+    # --------------------------------------------------------------------- #
+    #  VESSEL SEARCH
+    # --------------------------------------------------------------------- #
+    def search_vessels(
+        self,
+        query,
+        datasets=None,
+        includes=None,
+        limit=20,
+        match_fields=None,
+    ):
         """
-        Search for vessels by query (e.g., MMSI).
+        Search for vessels by query (e.g., MMSI or IMO).
 
-        Parameters:
-            query (str): Search term.
-            datasets (list of str): Datasets to search, e.g., ['public-global-vessel-identity:latest'].
-            includes (list of str): Additional fields to include, choices are 'MATCH_CRITERIA', 'OWNERSHIP', etc.
-            limit (int): Max number of results.
-            match_fields (str): Filter by match fields, e.g., 'SEVERAL_FIELDS'.
+        Parameters
+        ----------
+        query : str
+            Search term.
+        datasets : list[str] | None
+            Dataset IDs to search in, e.g. ['public-global-vessel-identity:latest'].
+        includes : list[str] | None
+            Extra sections to include in the response.  Valid values include
+            'MATCH_CRITERIA', 'OWNERSHIP', etc.
+        limit : int
+            Maximum number of results to return.
+        match_fields : str | None
+            Filter by match fields, e.g. 'SEVERAL_FIELDS'.
 
-        Returns:
-            dict: JSON response.
+        Returns
+        -------
+        dict
+            Parsed JSON response.
         """
         params = {"query": query, "limit": limit}
+
+        # datasets[] MUST be provided as indexed parameters
         if datasets:
             for idx, ds in enumerate(datasets):
                 params[f"datasets[{idx}]"] = ds
+
+        # NOTE: the *search* endpoint expects indexed includes parameters
+        #       (e.g. includes[0]=MATCH_CRITERIA).  Sending a single
+        #       comma-separated string triggers a 422 validation error.
         if includes:
-            params["includes"] = ",".join(includes)
+            for idx, inc in enumerate(includes):
+                params[f"includes[{idx}]"] = inc
+
         if match_fields:
             params["match_fields"] = match_fields
+
         response = self.session.get(f"{self.base_url}/vessels/search", params=params)
         response.raise_for_status()
         return response.json()
 
-    def get_vessel_details(self, vessel_id, dataset="public-global-vessel-identity:latest", includes=None):
+    # --------------------------------------------------------------------- #
+    #  VESSEL DETAILS
+    # --------------------------------------------------------------------- #
+    def get_vessel_details(
+        self,
+        vessel_id,
+        dataset="public-global-vessel-identity:latest",
+        includes=None,
+    ):
         """
-        Get detailed vessel identity record.
+        Retrieve a detailed vessel identity record.
 
-        Parameters:
-            vessel_id (str): Vessel ID.
-            dataset (str): Dataset version.
-            includes (list of str): Additional includes, e.g., ['OWNERSHIP'].
+        Parameters
+        ----------
+        vessel_id : str
+            Vessel ID returned by the search endpoint.
+        dataset : str
+            Dataset version.  Defaults to 'public-global-vessel-identity:latest'.
+        includes : list[str] | None
+            Extra sections to include in the response.  Valid values include
+            'OWNERSHIP', 'FLAG', etc.
 
-        Returns:
-            dict: JSON response.
+        Returns
+        -------
+        dict
+            Parsed JSON response.
         """
         params = {"dataset": dataset}
+
+        # Contrary to the search endpoint, the *details* endpoint expects
+        # a single, comma-separated string for the includes parameter.
         if includes:
-            for idx, inc in enumerate(includes):
-                params[f"includes[{idx}]"] = inc
+            params["includes"] = ",".join(includes)
+
         response = self.session.get(f"{self.base_url}/vessels/{vessel_id}", params=params)
         response.raise_for_status()
         return response.json()
