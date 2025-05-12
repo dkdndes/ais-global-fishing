@@ -44,9 +44,9 @@ def search_vessels(query=None, limit=20, includes=None, match_fields=None):
     # Build query parameters
     params = {}
     
-    # Add datasets (required)
-    for dataset in datasets:
-        params.setdefault('datasets[]', []).append(dataset)
+    # Add datasets (required) - using the format datasets[]=value
+    for i, dataset in enumerate(datasets):
+        params[f'datasets[{i}]'] = dataset
     
     # Add optional parameters
     if query and len(query) >= 3:
@@ -73,6 +73,13 @@ def search_vessels(query=None, limit=20, includes=None, match_fields=None):
     try:
         with httpx.Client() as client:
             response = client.get(vessels_search_url, params=params, headers=headers)
+            print(f"Request URL: {response.url}")
+            print(f"Request Headers: {headers}")
+            
+            if response.status_code != 200:
+                print(f"Response Status: {response.status_code}")
+                print(f"Response Body: {response.text}")
+                
             response.raise_for_status()
             return response.json()
     except httpx.HTTPStatusError as e:
