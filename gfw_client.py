@@ -3,15 +3,9 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Try to import the GFW API client
-try:
-    from gfwapiclient import GFWClient
-    from gfwapiclient.resources.vessels import VesselsResource
-    HAS_GFW_CLIENT = True
-except ImportError:
-    HAS_GFW_CLIENT = False
-    print("GFW API client not installed. Using direct API calls instead.")
-    print("To install: uv add gfw-api-python-client")
+# Import the GFW API client
+from gfwapiclient import GFWClient
+from gfwapiclient.resources.vessels import VesselsResource
 
 # Load environment variables from .env file
 env_path = Path('.') / '.env'
@@ -20,7 +14,7 @@ load_dotenv(dotenv_path=env_path)
 # Get API key from environment variables
 api_key = os.getenv('GLOBALFISHING_WATCH_API_KEY')
 
-def search_vessels_with_client(query=None, limit=20, includes=None, match_fields=None):
+def search_vessels(query=None, limit=20, includes=None, match_fields=None):
     """
     Search vessels using the GFW API client library
     
@@ -33,9 +27,6 @@ def search_vessels_with_client(query=None, limit=20, includes=None, match_fields
     Returns:
         dict: API response
     """
-    if not HAS_GFW_CLIENT:
-        raise ImportError("GFW API client not installed. Please install with: uv pip install gfw-api-python-client")
-    
     if not api_key:
         raise ValueError("Missing GLOBALFISHING_WATCH_API_KEY environment variable")
     
@@ -71,23 +62,19 @@ def search_vessels_with_client(query=None, limit=20, includes=None, match_fields
         return {"error": str(e)}
 
 if __name__ == "__main__":
-    if HAS_GFW_CLIENT:
-        print("Searching vessels with GFW API client...")
-        
-        # Basic search
-        results = search_vessels_with_client()
-        print(f"\nFound {len(results.get('entries', []))} vessels")
-        
-        # Search with query
-        query_results = search_vessels_with_client(query="Phoenix")
-        print(f"\nFound {len(query_results.get('entries', []))} vessels matching 'Phoenix'")
-        
-        # Print first result if available
-        if query_results.get('entries') and len(query_results.get('entries')) > 0:
-            first_vessel = query_results['entries'][0]
-            print("\nFirst vessel details:")
-            import json
-            print(json.dumps(first_vessel, indent=2))
-    else:
-        print("Please install the GFW API client to use this script:")
-        print("uv add gfw-api-python-client")
+    print("Searching vessels with GFW API client...")
+    
+    # Basic search
+    results = search_vessels()
+    print(f"\nFound {len(results.get('entries', []))} vessels")
+    
+    # Search with query
+    query_results = search_vessels(query="Phoenix")
+    print(f"\nFound {len(query_results.get('entries', []))} vessels matching 'Phoenix'")
+    
+    # Print first result if available
+    if query_results.get('entries') and len(query_results.get('entries')) > 0:
+        first_vessel = query_results['entries'][0]
+        print("\nFirst vessel details:")
+        import json
+        print(json.dumps(first_vessel, indent=2))
