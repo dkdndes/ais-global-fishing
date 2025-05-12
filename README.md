@@ -48,7 +48,10 @@ client = GFWClient(api_key="your-api-key-here")
 The package includes a command-line interface for quick searches and vessel lookups:
 
 ```bash
-# Using uv (recommended)
+# First install the package in development mode
+uv pip install -e .
+
+# Then run the CLI with uv
 uv run gfw --help
 
 # Or if installed in your active environment

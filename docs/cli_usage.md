@@ -9,10 +9,16 @@ The CLI is automatically installed when you install the package:
 ```bash
 # Using uv (recommended)
 uv pip install -e .
+# Then you can run the CLI with:
+uv run gfw --help
 
 # Or using pip
 pip install -e .
+# Then you can run the CLI directly:
+gfw --help
 ```
+
+> **Important**: When using `uv run gfw`, make sure you've installed the package in development mode with `uv pip install -e .` first.
 
 ## Basic Usage
 

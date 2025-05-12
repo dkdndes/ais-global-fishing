@@ -11,6 +11,12 @@ if [[ -z "${VIRTUAL_ENV}" ]]; then
     echo ""
 fi
 
+# Check if the package is installed in development mode
+if ! uv run python -c "import ais_global_fishing" &>/dev/null; then
+    echo "Installing package in development mode..."
+    uv pip install -e .
+fi
+
 # Check for required dependencies
 echo "Checking for dependencies..."
 MISSING_DEPS=()
