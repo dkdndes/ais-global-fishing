@@ -8,3 +8,8 @@ dependencies = [
     "httpx>=0.28.1",
     "python-dotenv>=1.0.0",
 ]
+
+[project.optional-dependencies]
+gfw = [
+    "gfw-api-python-client>=0.1.0",
+]

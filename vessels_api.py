@@ -23,8 +23,8 @@ base_url = base_url.rstrip('/')
 # Construct the vessels search URL
 vessels_search_url = f"{base_url}/v3/vessels/search"
 
-# Required datasets parameter
-datasets = ['public-global-fishing-vessels:latest', 'public-global-carrier-vessels:latest']
+# Required datasets parameter with correct version (v2 instead of latest)
+datasets = ['public-global-fishing-vessels:v2', 'public-global-carrier-vessels:v2']
 datasets_param = "&".join([f"datasets[]={dataset}" for dataset in datasets])
 
 # Function to make API request using httpx
