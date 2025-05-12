@@ -13,7 +13,7 @@ from __future__ import annotations
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable, List, Optional
+from typing import Iterable, Optional
 
 import requests
 from dotenv import load_dotenv
@@ -32,7 +32,7 @@ class GFWClient:
         Parameters
         ----------
         api_key
-            API token.  If *None*, it is read from the ``GLOBALFISHING_WATCH_API_KEY``
+            API token. If *None*, it is read from the ``GLOBALFISHING_WATCH_API_KEY``
             environment variable (``.env`` is loaded automatically).
         base_url
             Override API base (mostly useful for testing/staging).
@@ -52,13 +52,30 @@ class GFWClient:
         self.session = requests.Session()
         self.session.headers.update({"Authorization": f"Bearer {api_key}"})
 
-    # Internal helper --------------------------------------------------- #
+    # ------------------------------------------------------------------ #
+    # Internal helpers
+    # ------------------------------------------------------------------ #
     def _get(self, path: str, params: dict | None = None):
         """Perform a GET request and return parsed JSON."""
         url = f"{self.base_url}{path}"
         resp = self.session.get(url, params=params or {})
         resp.raise_for_status()
         return resp.json()
+
+    def _endpoint_exists(self, path: str) -> bool:
+        """
+        Perform a lightweight HEAD request to verify that an endpoint/path
+        exists (returns anything other than 404).
+
+        Some Gateway v3 sub-paths (e.g., /track) are not available for all
+        vessel IDs.  Checking ahead avoids burning a full GET request that
+        would raise an exception.
+        """
+        url = f"{self.base_url}{path}"
+        resp = self.session.head(url, allow_redirects=True)
+        # Any status except 404 is considered "exists" (401/403/400 will be
+        # dealt with by the subsequent GET).
+        return resp.status_code != 404
 
     # ------------------------------------------------------------------ #
     # Search & identity endpoints
@@ -123,19 +140,22 @@ class GFWClient:
         """
         AIS track of a vessel.
 
-        Parameters
-        ----------
-        start, end : datetime
-            Time window (UTC).
-        resolution : str
-            E.g. ``5m``, ``1h``.
+        A HEAD request is sent first to verify that the /track endpoint is
+        available for the given vessel ID. If it does not exist, a
+        ``FileNotFoundError`` is raised.
         """
+        path = f"/vessels/{vessel_id}/track"
+        if not self._endpoint_exists(path):
+            raise FileNotFoundError(
+                f"Track endpoint not available for vesselId '{vessel_id}'"
+            )
+
         params = {
             "start": start.isoformat(timespec="seconds") + "Z",
             "end": end.isoformat(timespec="seconds") + "Z",
             "resolution": resolution,
         }
-        return self._get(f"/vessels/{vessel_id}/track", params)
+        return self._get(path, params)
 
     def get_segments(
         self,
@@ -144,11 +164,17 @@ class GFWClient:
         end: datetime,
     ):
         """Continuous-signal trajectory segments."""
+        path = f"/vessels/{vessel_id}/segments"
+        if not self._endpoint_exists(path):
+            raise FileNotFoundError(
+                f"Segments endpoint not available for vesselId '{vessel_id}'"
+            )
+
         params = {
             "start": start.isoformat(timespec="seconds") + "Z",
             "end": end.isoformat(timespec="seconds") + "Z",
         }
-        return self._get(f"/vessels/{vessel_id}/segments", params)
+        return self._get(path, params)
 
     # ------------------------------------------------------------------ #
     # Behavioural events
