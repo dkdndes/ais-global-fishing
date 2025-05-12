@@ -45,3 +45,12 @@ Contributors will be added to this file after their first pull request is merged
 ---
 
 *This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.*
+# Contributors
+
+## Core Maintainers
+
+- Peter Rosemann ([@dkdndes](https://github.com/dkdndes)) - <dkdndes@gmail.com>
+
+## Contributors
+
+If you've contributed to this project, please add your name here by submitting a pull request.

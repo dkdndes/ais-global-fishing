@@ -72,3 +72,56 @@ As a contributor, you agree to abide by the project's code of conduct. Please be
 ## Questions?
 
 If you have any questions about contributing, please open an issue or contact the project maintainer directly.
+# Contributing to AIS Global Fishing
+
+Thank you for your interest in contributing to the AIS Global Fishing project! This document provides guidelines and instructions for contributing.
+
+## Development Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/dkdndes/ais-global-fishing.git
+   cd ais-global-fishing
+   ```
+
+2. Set up the development environment:
+   ```bash
+   uv venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   uv sync
+   ```
+
+3. Install development dependencies:
+   ```bash
+   uv pip install -e ".[dev]"
+   ```
+
+## Code Style
+
+This project follows PEP 8 style guidelines. Please ensure your code adheres to these standards.
+
+## Testing
+
+Before submitting a pull request, please run the tests to ensure your changes don't break existing functionality:
+
+```bash
+pytest
+```
+
+## Submitting Changes
+
+1. Fork the repository
+2. Create a new branch for your feature or bugfix
+3. Make your changes
+4. Run tests to ensure they pass
+5. Submit a pull request
+
+## Pull Request Process
+
+1. Update the README.md or documentation with details of changes if appropriate
+2. Update the examples if needed
+3. The PR should work on the main branch
+
+## Contact
+
+If you have any questions, feel free to contact Peter Rosemann at dkdndes@gmail.com.
