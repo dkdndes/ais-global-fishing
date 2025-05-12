@@ -107,8 +107,11 @@ class TestGFWClient:
         result = client_obj.search_vessels(query="test_vessel", limit=5)
         
         mock_session.get.assert_called_once()
-        assert "query=test_vessel" in str(mock_session.get.call_args)
-        assert "limit=5" in str(mock_session.get.call_args)
+        # Check that the parameters were passed correctly
+        call_args = mock_session.get.call_args
+        params = call_args[1]['params']
+        assert params['query'] == 'test_vessel'
+        assert params['limit'] == 5
         assert result == expected_result
 
     def test_search_vessels_no_query_or_where(self, client):
@@ -132,8 +135,12 @@ class TestGFWClient:
         )
         
         mock_session.get.assert_called_once()
-        assert "/vessels/vessel1" in str(mock_session.get.call_args)
-        assert "includes=OWNERSHIP,AUTHORIZATIONS" in str(mock_session.get.call_args)
+        # Check that the URL contains the vessel ID
+        call_args = mock_session.get.call_args
+        assert "/vessels/vessel1" in call_args[0][0]
+        # Check that the includes parameter was properly formatted
+        params = call_args[1]['params']
+        assert params['includes'] == 'OWNERSHIP,AUTHORIZATIONS'
         assert result == expected_result
 
     def test_get_track(self, client):
@@ -157,9 +164,12 @@ class TestGFWClient:
         
         assert mock_session.head.call_count == 1
         assert mock_session.get.call_count == 1
-        assert "start=2023-01-01T00:00:00Z" in str(mock_session.get.call_args)
-        assert "end=2023-01-31T00:00:00Z" in str(mock_session.get.call_args)
-        assert "resolution=2h" in str(mock_session.get.call_args)
+        # Check that the parameters were passed correctly
+        call_args = mock_session.get.call_args
+        params = call_args[1]['params']
+        assert params['start'] == '2023-01-01T00:00:00Z'
+        assert params['end'] == '2023-01-31T00:00:00Z'
+        assert params['resolution'] == '2h'
         assert result == expected_result
 
     def test_get_track_endpoint_not_found(self, client):
