@@ -1,18 +1,30 @@
-site_name: GFW Python Client
-site_description: Thin Python wrapper for the Global Fishing Watch Gateway v3 API
-site_author: Your Name
-repo_url: https://github.com/your-org/your-repo
-docs_dir: docs
+site_name: AIS Stream Library Documentation
+site_description: Documentation for the AIS Stream Library
+site_author: Peter Rosemann
+repo_url: https://github.com/dkdndes/ais-stream-lib
+copyright: '© 2025 Peter Rosemann - Licensed under Business Source License 1.1'
+
+theme: readthedocs
+
 nav:
   - Home: index.md
-  - Quick-start: usage.md
-  - API Reference: api_reference.md
-  - Examples: examples.md
-theme:
-  name: material
-  palette:
-    scheme: default
+  - Getting Started: getting_started.md
+  - Developer Guide: developer/index.md
+  - API Reference: api/index.md
+  - Examples:
+    - Overview: examples/index.md
+    - Basic Receiver: examples/basic_receiver.md
+    - Message Statistics: examples/message_statistics.md
+    - Ship Tracker: examples/ship_tracker.md
+    - Vessel Tracker with GeoJSON: examples/vessel_tracker_geojson.md
+  - Contributing: contributing.md
+  - License: license.md
+
 markdown_extensions:
   - admonition
+  - codehilite
   - toc:
       permalink: true
+
+plugins:
+  - search
