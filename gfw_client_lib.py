@@ -53,8 +53,7 @@ class GFWClient:
             for idx, ds in enumerate(datasets):
                 params[f"datasets[{idx}]"] = ds
         if includes:
-            for idx, inc in enumerate(includes):
-                params[f"includes[{idx}]"] = inc
+            params["includes"] = ",".join(includes)
         if match_fields:
             params["match_fields"] = match_fields
         response = self.session.get(f"{self.base_url}/vessels/search", params=params)
