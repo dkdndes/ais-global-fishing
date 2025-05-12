@@ -31,9 +31,9 @@ def cmd_search(args: argparse.Namespace) -> None:
     if not entries:
         print("No vessels found.", file=sys.stderr)
         sys.exit(1)
-
-    print(f"Found {len(entries)} entries – showing the first one:\n")
-    pprint(entries[0])
+    else:
+        print(f"Found {len(entries)} entries – showing the first one:\n")
+        pprint(entries[0])
 
 
 def cmd_details(args: argparse.Namespace) -> None:
