@@ -39,8 +39,7 @@ def find_vessel_by_mmsi(mmsi):
         
         # 2) Pull full identity record
         detail_params = {
-            "dataset": "public-global-vessel-identity:latest",
-            "includes[0]": "OWNERSHIP"
+            "dataset": "public-global-vessel-identity:latest"
         }
         
         detail_response = requests.get(f"{BASE}/vessels/{vessel_id}", params=detail_params, headers=HEAD)
