@@ -4,7 +4,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Import the GFW API client
-from gfwapiclient import GFWClient
+from gfwapiclient import Client
 from gfwapiclient.resources.vessels import VesselsResource
 
 # Load environment variables from .env file
@@ -31,7 +31,7 @@ def search_vessels(query=None, limit=20, includes=None, match_fields=None):
         raise ValueError("Missing GLOBALFISHING_WATCH_API_KEY environment variable")
     
     # Initialize the GFW client
-    client = GFWClient(token=api_key)
+    client = Client(token=api_key)
     
     # Get the vessels resource
     vessels = VesselsResource(client)
