@@ -50,7 +50,10 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = ["ais_global_fishing"]
 
-[tool.pytest]
+[project.scripts]
+gfw = "ais_global_fishing.__main__:main"
+
+[tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
