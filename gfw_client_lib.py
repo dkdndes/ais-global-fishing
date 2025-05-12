@@ -3,9 +3,8 @@
 gfw_client_lib.py
 
 Thin Python wrapper around the Global Fishing Watch Gateway v3 API.
-Only the most common endpoints are implemented; each method returns the
-parsed JSON response (i.e. dict / list) or raises ``requests.HTTPError`` on
-non-2xx status codes.
+Every method returns the parsed JSON response (dict / list) or raises
+``requests.HTTPError`` on non-2xx status codes.
 """
 
 from __future__ import annotations
@@ -38,14 +37,12 @@ class GFWClient:
             Override API base (mostly useful for testing/staging).
         """
         if api_key is None:
-            env_path = Path(".") / ".env"
-            load_dotenv(env_path)
+            load_dotenv(Path(".") / ".env")
             api_key = os.getenv("GLOBALFISHING_WATCH_API_KEY")
 
         if not api_key:
             raise ValueError(
-                "API key not found. "
-                "Pass it explicitly or set GLOBALFISHING_WATCH_API_KEY / .env."
+                "API key not found. Pass it explicitly or set GLOBALFISHING_WATCH_API_KEY / .env."
             )
 
         self.base_url = base_url or self.DEFAULT_BASE_URL
@@ -53,7 +50,7 @@ class GFWClient:
         self.session.headers.update({"Authorization": f"Bearer {api_key}"})
 
     # ------------------------------------------------------------------ #
-    # Internal helpers
+    # _internal request helpers
     # ------------------------------------------------------------------ #
     def _get(self, path: str, params: dict | None = None):
         """Perform a GET request and return parsed JSON."""
@@ -64,17 +61,11 @@ class GFWClient:
 
     def _endpoint_exists(self, path: str) -> bool:
         """
-        Perform a lightweight HEAD request to verify that an endpoint/path
-        exists (returns anything other than 404).
-
-        Some Gateway v3 sub-paths (e.g., /track) are not available for all
-        vessel IDs.  Checking ahead avoids burning a full GET request that
-        would raise an exception.
+        Issue a HEAD to verify that *path* exists (any status except 404).
+        Helps to avoid unnecessary GETs that would otherwise raise.
         """
         url = f"{self.base_url}{path}"
         resp = self.session.head(url, allow_redirects=True)
-        # Any status except 404 is considered "exists" (401/403/400 will be
-        # dealt with by the subsequent GET).
         return resp.status_code != 404
 
     # ------------------------------------------------------------------ #
@@ -82,19 +73,34 @@ class GFWClient:
     # ------------------------------------------------------------------ #
     def search_vessels(
         self,
-        query: str,
+        *,
+        query: str | None = None,
+        where: str | None = None,
         datasets: Optional[Iterable[str]] = None,
         includes: Optional[Iterable[str]] = None,
         limit: int = 20,
         match_fields: Optional[str] = None,
     ):
         """
-        Search for vessels (MMSI, IMO, name…).
+        Flexible search wrapper around ``/vessels/search``.
 
-        The search endpoint expects **indexed** params for lists,
+        Supports:
+        • text ``query``    (MMSI, IMO, name, callsign…)
+        • SQL-like ``where`` (e.g. ``combinedSourcesInfo.shiptypes.name='CARRIER'``)
+
+        At least one of *query* or *where* must be provided.
+
+        The search endpoint expects **indexed** parameters for list values,
         e.g. ``includes[0]=MATCH_CRITERIA``.
         """
-        params: dict[str, str | int] = {"query": query, "limit": limit}
+        if query is None and where is None:
+            raise ValueError("Either 'query' or 'where' must be supplied")
+
+        params: dict[str, str | int] = {"limit": limit}
+        if query is not None:
+            params["query"] = query
+        if where is not None:
+            params["where"] = where
 
         if datasets:
             for idx, ds in enumerate(datasets):
@@ -116,16 +122,47 @@ class GFWClient:
         includes: Optional[Iterable[str]] = None,
     ):
         """
-        Retrieve full vessel identity.
+        Retrieve a *single* vessel identity record.
 
-        ``includes`` must be a comma-separated string for *this* endpoint.
+        ``includes`` must be sent as a comma-separated string for this endpoint.
         """
         params: dict[str, str] = {"dataset": dataset}
-
         if includes:
             params["includes"] = ",".join(includes)
-
         return self._get(f"/vessels/{vessel_id}", params)
+
+    def get_vessels_bulk(
+        self,
+        ids: Iterable[str],
+        datasets: Optional[Iterable[str]] = None,
+        includes: Optional[Iterable[str]] = None,
+    ):
+        """
+        Fetch several vessels in one call via ``/vessels``.
+
+        Parameters
+        ----------
+        ids
+            List / iterable of vessel IDs.
+        datasets
+            Optional dataset IDs.
+        includes
+            List of INCLUDE sections, will be sent as indexed params.
+        """
+        params: dict[str, str] = {}
+
+        for idx, _id in enumerate(ids):
+            params[f"ids[{idx}]"] = _id
+
+        if datasets:
+            for idx, ds in enumerate(datasets):
+                params[f"datasets[{idx}]"] = ds
+
+        if includes:
+            for idx, inc in enumerate(includes):
+                params[f"includes[{idx}]"] = inc
+
+        return self._get("/vessels", params)
 
     # ------------------------------------------------------------------ #
     # Track & trajectory
@@ -138,17 +175,11 @@ class GFWClient:
         resolution: str = "1h",
     ):
         """
-        AIS track of a vessel.
-
-        A HEAD request is sent first to verify that the /track endpoint is
-        available for the given vessel ID. If it does not exist, a
-        ``FileNotFoundError`` is raised.
+        AIS track of a vessel. Raises ``FileNotFoundError`` if /track is absent.
         """
         path = f"/vessels/{vessel_id}/track"
         if not self._endpoint_exists(path):
-            raise FileNotFoundError(
-                f"Track endpoint not available for vesselId '{vessel_id}'"
-            )
+            raise FileNotFoundError(f"Track endpoint not available for vesselId '{vessel_id}'")
 
         params = {
             "start": start.isoformat(timespec="seconds") + "Z",
@@ -157,18 +188,11 @@ class GFWClient:
         }
         return self._get(path, params)
 
-    def get_segments(
-        self,
-        vessel_id: str,
-        start: datetime,
-        end: datetime,
-    ):
+    def get_segments(self, vessel_id: str, start: datetime, end: datetime):
         """Continuous-signal trajectory segments."""
         path = f"/vessels/{vessel_id}/segments"
         if not self._endpoint_exists(path):
-            raise FileNotFoundError(
-                f"Segments endpoint not available for vesselId '{vessel_id}'"
-            )
+            raise FileNotFoundError(f"Segments endpoint not available for vesselId '{vessel_id}'")
 
         params = {
             "start": start.isoformat(timespec="seconds") + "Z",
@@ -188,8 +212,7 @@ class GFWClient:
     ):
         """
         Events detected for *one* vessel.
-
-        ``event_types`` can be a list such as ``["FISHING", "PORT_VISIT"]``.
+        ``event_types`` like ``["FISHING", "PORT_VISIT"]``.
         """
         params = {
             "start": start.isoformat(timespec="seconds") + "Z",
@@ -199,7 +222,7 @@ class GFWClient:
             params["eventType"] = ",".join(event_types)
         return self._get(f"/vessels/{vessel_id}/events", params)
 
-    # ---- mass event endpoints (encounters, transshipments, …) --------- #
+    # ---- mass event endpoints (encounters, transshipments…) ------------ #
     def _get_event_collection(
         self,
         collection_name: str,
@@ -215,28 +238,20 @@ class GFWClient:
             params["vesselIds"] = ",".join(vessel_ids)
         return self._get(f"/events/{collection_name}", params)
 
-    def get_encounters(
-        self, start: datetime, end: datetime, vessel_ids: Optional[Iterable[str]] = None
-    ):
-        """Buque-buque encounters (possible transhipment rendez-vous)."""
+    def get_encounters(self, start: datetime, end: datetime, vessel_ids: Optional[Iterable[str]] = None):
+        """Buque-buque encounters (possible transhipments)."""
         return self._get_event_collection("encounters", start, end, vessel_ids)
 
-    def get_transshipments(
-        self, start: datetime, end: datetime, vessel_ids: Optional[Iterable[str]] = None
-    ):
+    def get_transshipments(self, start: datetime, end: datetime, vessel_ids: Optional[Iterable[str]] = None):
         """Confirmed / likely transhipment events."""
         return self._get_event_collection("transshipments", start, end, vessel_ids)
 
-    def get_fishing_events(
-        self, start: datetime, end: datetime, vessel_ids: Optional[Iterable[str]] = None
-    ):
+    def get_fishing_events(self, start: datetime, end: datetime, vessel_ids: Optional[Iterable[str]] = None):
         """Fishing activity events."""
         return self._get_event_collection("fishing", start, end, vessel_ids)
 
-    def get_loitering_events(
-        self, start: datetime, end: datetime, vessel_ids: Optional[Iterable[str]] = None
-    ):
-        """Loitering events (slow movement in high-risk areas, etc.)."""
+    def get_loitering_events(self, start: datetime, end: datetime, vessel_ids: Optional[Iterable[str]] = None):
+        """Loitering events (slow movement in high-risk areas)."""
         return self._get_event_collection("loitering", start, end, vessel_ids)
 
     # ------------------------------------------------------------------ #
