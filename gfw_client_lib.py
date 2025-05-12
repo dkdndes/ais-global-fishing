@@ -31,10 +31,11 @@ class GFWClient:
         Parameters
         ----------
         api_key
-            API token. If *None*, it is read from the ``GLOBALFISHING_WATCH_API_KEY``
-            environment variable (``.env`` is loaded automatically).
+            API token.  If *None*, it is read from the environment variable
+            ``GLOBALFISHING_WATCH_API_KEY`` (``.env`` will be loaded
+            automatically if present).
         base_url
-            Override API base (mostly useful for testing/staging).
+            Override API base (useful for staging).
         """
         if api_key is None:
             load_dotenv(Path(".") / ".env")
@@ -42,7 +43,8 @@ class GFWClient:
 
         if not api_key:
             raise ValueError(
-                "API key not found. Pass it explicitly or set GLOBALFISHING_WATCH_API_KEY / .env."
+                "API key not found.  Pass it explicitly or set "
+                "GLOBALFISHING_WATCH_API_KEY / .env."
             )
 
         self.base_url = base_url or self.DEFAULT_BASE_URL
@@ -131,11 +133,15 @@ class GFWClient:
             params["includes"] = ",".join(includes)
         return self._get(f"/vessels/{vessel_id}", params)
 
+    # ---------------  bulk identity ----------------------------------- #
     def get_vessels_bulk(
         self,
         ids: Iterable[str],
+        *,
         datasets: Optional[Iterable[str]] = None,
         includes: Optional[Iterable[str]] = None,
+        registries_info_data: Optional[str] = None,
+        binary: Optional[bool] = None,
     ):
         """
         Fetch several vessels in one call via ``/vessels``.
@@ -143,11 +149,16 @@ class GFWClient:
         Parameters
         ----------
         ids
-            List / iterable of vessel IDs.
+            Vessel IDs to request.
         datasets
-            Optional dataset IDs.
+            Optional list of dataset identifiers.
         includes
-            List of INCLUDE sections, will be sent as indexed params.
+            Sections to include (indexed as includes[0] …).
+        registries_info_data
+            Value for ``registries-info-data`` query parameter
+            (e.g. ``"ALL"``).
+        binary
+            If *True/False*, sets ``binary=TRUE/FALSE``.
         """
         params: dict[str, str] = {}
 
@@ -162,6 +173,12 @@ class GFWClient:
             for idx, inc in enumerate(includes):
                 params[f"includes[{idx}]"] = inc
 
+        if registries_info_data is not None:
+            params["registries-info-data"] = registries_info_data
+
+        if binary is not None:
+            params["binary"] = "TRUE" if binary else "FALSE"
+
         return self._get("/vessels", params)
 
     # ------------------------------------------------------------------ #
@@ -174,9 +191,7 @@ class GFWClient:
         end: datetime,
         resolution: str = "1h",
     ):
-        """
-        AIS track of a vessel. Raises ``FileNotFoundError`` if /track is absent.
-        """
+        """AIS track of a vessel. Raises ``FileNotFoundError`` if /track is absent."""
         path = f"/vessels/{vessel_id}/track"
         if not self._endpoint_exists(path):
             raise FileNotFoundError(f"Track endpoint not available for vesselId '{vessel_id}'")
