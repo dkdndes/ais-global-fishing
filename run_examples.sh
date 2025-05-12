@@ -16,13 +16,13 @@ echo "Checking for dependencies..."
 MISSING_DEPS=()
 
 # Check for tabulate (used in several examples)
-python -c "import tabulate" 2>/dev/null || MISSING_DEPS+=("tabulate")
+uv run -c "import tabulate" 2>/dev/null || MISSING_DEPS+=("tabulate")
 
 # Check for matplotlib (used in bulk_vessels example)
-python -c "import matplotlib" 2>/dev/null || MISSING_DEPS+=("matplotlib")
+uv run -c "import matplotlib" 2>/dev/null || MISSING_DEPS+=("matplotlib")
 
 # Check for folium (used in track example)
-python -c "import folium" 2>/dev/null || MISSING_DEPS+=("folium")
+uv run -c "import folium" 2>/dev/null || MISSING_DEPS+=("folium")
 
 # Install missing dependencies if any
 if [ ${#MISSING_DEPS[@]} -ne 0 ]; then
@@ -30,7 +30,7 @@ if [ ${#MISSING_DEPS[@]} -ne 0 ]; then
     read -p "Would you like to install them now? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        pip install ${MISSING_DEPS[*]}
+        uv pip install ${MISSING_DEPS[*]}
     else
         echo "Some examples may not work correctly without these dependencies."
     fi
@@ -51,7 +51,7 @@ EXAMPLES=(
 for example in "${EXAMPLES[@]}"; do
     if [ -f "examples/$example" ]; then
         echo -e "\n\n========== Running $example =========="
-        python "examples/$example"
+        uv run "examples/$example"
         echo -e "\n========== Finished $example ==========\n"
         
         # Pause between examples
@@ -81,13 +81,13 @@ echo "Checking for dependencies..."
 MISSING_DEPS=()
 
 # Check for tabulate (used in several examples)
-python -c "import tabulate" 2>/dev/null || MISSING_DEPS+=("tabulate")
+uv run -c "import tabulate" 2>/dev/null || MISSING_DEPS+=("tabulate")
 
 # Check for matplotlib (used in bulk_vessels example)
-python -c "import matplotlib" 2>/dev/null || MISSING_DEPS+=("matplotlib")
+uv run -c "import matplotlib" 2>/dev/null || MISSING_DEPS+=("matplotlib")
 
 # Check for folium (used in track example)
-python -c "import folium" 2>/dev/null || MISSING_DEPS+=("folium")
+uv run -c "import folium" 2>/dev/null || MISSING_DEPS+=("folium")
 
 # Install missing dependencies if any
 if [ ${#MISSING_DEPS[@]} -ne 0 ]; then
@@ -95,7 +95,7 @@ if [ ${#MISSING_DEPS[@]} -ne 0 ]; then
     read -p "Would you like to install them now? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        pip install ${MISSING_DEPS[*]}
+        uv pip install ${MISSING_DEPS[*]}
     else
         echo "Some examples may not work correctly without these dependencies."
     fi
@@ -116,7 +116,7 @@ EXAMPLES=(
 for example in "${EXAMPLES[@]}"; do
     if [ -f "examples/$example" ]; then
         echo -e "\n\n========== Running $example =========="
-        python "examples/$example"
+        uv run "examples/$example"
         echo -e "\n========== Finished $example ==========\n"
         
         # Pause between examples
