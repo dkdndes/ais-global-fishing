@@ -3,7 +3,7 @@ import os
 import json
 import httpx
 from pathlib import Path
-from python_dotenv import load_dotenv
+from dotenv import load_dotenv
 
 # Load environment variables from .env file
 env_path = Path('.') / '.env'
