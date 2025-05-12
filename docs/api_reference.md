@@ -1,6 +1,6 @@
 # API Reference
 
-::: gfw_client_lib.GFWClient
+::: ais_global_fishing.gfw_client_lib.GFWClient
     options:
       members:
         - __init__

@@ -1,30 +1,48 @@
-site_name: AIS Stream Library Documentation
-site_description: Documentation for the AIS Stream Library
+site_name: Global Fishing Watch API Client
+site_description: Python client for the Global Fishing Watch API
 site_author: Peter Rosemann
-repo_url: https://github.com/dkdndes/ais-stream-lib
-copyright: '© 2025 Peter Rosemann - Licensed under Business Source License 1.1'
+repo_url: https://github.com/dkdndes/ais-global-fishing
+copyright: '© 2025 Peter Rosemann - MIT License'
 
-theme: readthedocs
+theme:
+  name: material
+  palette:
+    primary: blue
+    accent: light blue
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.indexes
+    - content.code.copy
 
 nav:
   - Home: index.md
   - Getting Started: getting_started.md
-  - Developer Guide: developer/index.md
-  - API Reference: api/index.md
-  - Examples:
-    - Overview: examples/index.md
-    - Basic Receiver: examples/basic_receiver.md
-    - Message Statistics: examples/message_statistics.md
-    - Ship Tracker: examples/ship_tracker.md
-    - Vessel Tracker with GeoJSON: examples/vessel_tracker_geojson.md
-  - Contributing: contributing.md
-  - License: license.md
+  - Usage: usage.md
+  - Examples: examples.md
+  - API Reference: api_reference.md
+  - Contributing: https://github.com/dkdndes/ais-global-fishing/blob/main/CONTRIBUTING.md
+  - License: https://github.com/dkdndes/ais-global-fishing/blob/main/LICENSE
 
 markdown_extensions:
   - admonition
   - codehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
   - toc:
       permalink: true
 
 plugins:
   - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+            heading_level: 3

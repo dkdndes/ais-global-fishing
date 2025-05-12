@@ -114,8 +114,19 @@ Or use the provided script:
 For more detailed documentation:
 
 ```bash
-pip install -e ".[docs]"
-mkdocs serve
+# Create a virtual environment if you haven't already
+uv venv
+
+# Activate the virtual environment
+source .venv/bin/activate  # On macOS/Linux
+# or
+# .venv\Scripts\activate  # On Windows
+
+# Install the package with documentation dependencies
+uv pip install -e ".[docs]"
+
+# Build and serve the documentation
+uv run mkdocs serve
 ```
 
 Then visit http://127.0.0.1:8000/ in your browser.
