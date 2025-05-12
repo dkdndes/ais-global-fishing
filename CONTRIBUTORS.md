@@ -1,6 +1,6 @@
 # Contributors
 
-This document recognizes the people who have made contributions to the AIS Stream Library project.
+This document recognizes the people who have made contributions to the AIS AIS Global Fishing Wrapper Library project.
 
 ## Project Lead
 

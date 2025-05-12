@@ -1,18 +1,4 @@
-# Byte-compiled / cache
-__pycache__/
-*.py[cod]
+.DS*
+.aider*
+*.log
 
-# Virtual environments
-.venv/
-env/
-venv/
-
-# Editor / OS files
-*.swp
-.DS_Store
-
-# Secrets
-.env
-
-# MkDocs site
-site/

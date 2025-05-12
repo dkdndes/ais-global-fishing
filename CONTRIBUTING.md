@@ -1,6 +1,6 @@
-# Contributing to AIS Stream Library
+# Contributing to AIS Global Fishing Wrapper Library
 
-As an open source project, AIS Stream Library welcomes contributions of many forms.
+As an open source project, AIS Global Fishing Wrapper Library welcomes contributions of many forms.
 
 ## Examples of contributions include:
 
@@ -72,9 +72,10 @@ As a contributor, you agree to abide by the project's code of conduct. Please be
 ## Questions?
 
 If you have any questions about contributing, please open an issue or contact the project maintainer directly.
-# Contributing to AIS Global Fishing
 
-Thank you for your interest in contributing to the AIS Global Fishing project! This document provides guidelines and instructions for contributing.
+# Contributing to AIS Global Fishing Wrapper Library
+
+Thank you for your interest in contributing to the AIS Global Fishing Wrapper project! This document provides guidelines and instructions for contributing.
 
 ## Development Setup
 
