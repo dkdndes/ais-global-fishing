@@ -4,6 +4,9 @@ example_track.py
 
 Retrieve the AIS track for the last 7 days of a vessel located via MMSI
 and visualize the track on a map.
+
+Run with:
+    uv run python examples/example_track.py
 """
 
 from datetime import datetime, timedelta, timezone

@@ -4,6 +4,9 @@ example_events.py
 
 Demonstrate how to retrieve and analyze vessel behavioral events
 such as fishing activity, port visits, and encounters.
+
+Run with:
+    uv run python examples/example_events.py
 """
 
 from datetime import datetime, timedelta

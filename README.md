@@ -43,6 +43,28 @@ from ais_global_fishing import GFWClient
 client = GFWClient(api_key="your-api-key-here")
 ```
 
+## Command Line Interface
+
+The package includes a command-line interface for quick searches and vessel lookups:
+
+```bash
+# Using uv (recommended)
+uv run gfw --help
+
+# Or if installed in your active environment
+gfw --help
+```
+
+### Search for vessels
+```bash
+uv run gfw search "BOYANG"
+```
+
+### Get vessel details
+```bash
+uv run gfw details <vessel-id>
+```
+
 ## Quick Start
 
 ```python
@@ -100,6 +122,10 @@ The package includes several example scripts in the `examples/` directory:
 Run any example with:
 
 ```bash
+# Using uv (recommended)
+uv run python examples/example_usage.py
+
+# Or if installed in your active environment
 python examples/example_usage.py
 ```
 

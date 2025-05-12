@@ -4,6 +4,9 @@ example_bulk_vessels.py
 
 Demonstrate how to retrieve information for multiple vessels in bulk
 and perform comparative analysis.
+
+Run with:
+    uv run python examples/example_bulk_vessels.py
 """
 
 from datetime import datetime, timedelta

@@ -4,6 +4,9 @@ example_usage.py
 
 A comprehensive example showing how to use the AIS Global Fishing library
 for common vessel search and information retrieval tasks.
+
+Run with:
+    uv run python examples/example_usage.py
 """
 
 from ais_global_fishing import GFWClient

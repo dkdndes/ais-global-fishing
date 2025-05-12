@@ -51,7 +51,7 @@ EXAMPLES=(
 for example in "${EXAMPLES[@]}"; do
     if [ -f "examples/$example" ]; then
         echo -e "\n\n========== Running $example =========="
-        uv run "examples/$example"
+        uv run python "examples/$example"
         echo -e "\n========== Finished $example ==========\n"
         
         # Pause between examples

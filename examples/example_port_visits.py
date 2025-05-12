@@ -3,6 +3,9 @@
 example_port_visits.py
 
 Demonstrate how to retrieve and analyze port visits for vessels.
+
+Run with:
+    uv run python examples/example_port_visits.py
 """
 
 from datetime import datetime, timedelta

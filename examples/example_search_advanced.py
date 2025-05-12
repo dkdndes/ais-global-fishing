@@ -7,6 +7,9 @@ Demonstrate advanced search capabilities:
   • `where` queries with gear-type, flag, etc.
   • extra includes
   • complex filtering and analysis
+
+Run with:
+    uv run python examples/example_search_advanced.py
 """
 
 from pprint import pprint
