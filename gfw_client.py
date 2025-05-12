@@ -11,7 +11,7 @@ try:
 except ImportError:
     HAS_GFW_CLIENT = False
     print("GFW API client not installed. Using direct API calls instead.")
-    print("To install: uv pip install gfw-api-python-client")
+    print("To install: uv add gfw-api-python-client")
 
 # Load environment variables from .env file
 env_path = Path('.') / '.env'
@@ -90,4 +90,4 @@ if __name__ == "__main__":
             print(json.dumps(first_vessel, indent=2))
     else:
         print("Please install the GFW API client to use this script:")
-        print("uv pip install gfw-api-python-client")
+        print("uv add gfw-api-python-client")

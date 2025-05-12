@@ -21,7 +21,7 @@ if not api_key or not base_url:
 base_url = base_url.rstrip('/')
 
 # Construct the vessels search URL
-vessels_search_url = f"{base_url}/v3/vessels/search"
+vessels_search_url = f"{base_url}/api/v3/vessels/search"
 
 # Required datasets parameter with correct version (v2 instead of latest)
 datasets = ['public-global-fishing-vessels:v2', 'public-global-carrier-vessels:v2']
