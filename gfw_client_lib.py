@@ -82,18 +82,19 @@ class GFWClient:
         includes: Optional[Iterable[str]] = None,
         limit: int = 20,
         match_fields: Optional[str] = None,
+        binary: Optional[bool] = None,
     ):
         """
-        Flexible search wrapper around ``/vessels/search``.
+        Flexible wrapper around ``/vessels/search``.
 
         Supports:
         • text ``query``    (MMSI, IMO, name, callsign…)
         • SQL-like ``where`` (e.g. ``combinedSourcesInfo.shiptypes.name='CARRIER'``)
 
-        At least one of *query* or *where* must be provided.
-
-        The search endpoint expects **indexed** parameters for list values,
-        e.g. ``includes[0]=MATCH_CRITERIA``.
+        Additional options
+        ------------------
+        binary : bool | None
+            When *False* the server returns detailed JSON instead of binary blobs.
         """
         if query is None and where is None:
             raise ValueError("Either 'query' or 'where' must be supplied")
@@ -114,6 +115,9 @@ class GFWClient:
 
         if match_fields:
             params["match_fields"] = match_fields
+
+        if binary is not None:
+            params["binary"] = "TRUE" if binary else "FALSE"
 
         return self._get("/vessels/search", params)
 
