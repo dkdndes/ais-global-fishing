@@ -1,9 +1,9 @@
-# AIS Global Fishing
+# AIS Global Fishing Wrapper Library
 
 *A minimal yet powerful wrapper around the  
 [Global Fishing Watch **Gateway v3** API](https://docs.globalfishingwatch.org/).*
 
-This Python client library allows you to easily query vessel identity, AIS
+This Python client library allows you to query vessel identity, AIS
 tracks, behavioral events, port-visits, encounters, trips, risk scores & more
 – all from concise, typed Python helpers.
 
